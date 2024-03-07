@@ -12,7 +12,7 @@ export class ChatService {
   }
 
   public getChatroomMessages(chatId: string) {
-    return Chat.getInstance(chatId).getMessages();
+    return Chat.getInstance(chatId).getMessages().slice(1);
   }
 
   public async getChatCompletion(
