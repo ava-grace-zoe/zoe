@@ -11,8 +11,18 @@ export class ChatService {
     return Chat.getAll();
   }
 
-  public getChatroomMessages(chatId: string) {
-    return Chat.getInstance(chatId).getMessages().slice(1);
+  public getChatroomInfo(chatId: string) {
+    const chat = Chat.getInstance(chatId);
+
+    const messages = chat.getMessages().filter((v) => {
+      return v.role === 'assistant' || v.role === 'user';
+    });
+    const systemPrompt = chat.getSystemPrompt();
+
+    return {
+      messages,
+      systemPrompt,
+    };
   }
 
   public async getChatCompletion(
@@ -24,8 +34,12 @@ export class ChatService {
 
     const { message, model } = options;
     chat.addMessage({ role: 'user', content: message });
+    const messages = chat.getMessages();
+
+    console.log(messages);
+
     const reply = await this.openAiService.getChatCompletion(
-      chat.getMessages(),
+      messages,
       model == 3 ? 'gpt-3.5-turbo-0125' : 'gpt-4-0125-preview',
       true,
     );

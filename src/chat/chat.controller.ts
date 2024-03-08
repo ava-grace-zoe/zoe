@@ -12,8 +12,8 @@ export class ChatController {
   }
 
   @Get(':chatId')
-  getChatroomMessages(@Param('chatId') chatId: string) {
-    return this.chatService.getChatroomMessages(chatId);
+  getChatroomInfo(@Param('chatId') chatId: string) {
+    return this.chatService.getChatroomInfo(chatId);
   }
 
   @Post(':chatId')

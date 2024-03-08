@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
 import { v4 } from 'uuid';
 
 type Message = OpenAI.Chat.Completions.ChatCompletionMessageParam;
@@ -10,6 +11,7 @@ export class Chat {
   static getAll() {
     return Array.from(this.chatMap.values());
   }
+
   static getInstance(id?: string) {
     id = id ?? v4();
     let chat = this.chatMap.get(id);
@@ -20,18 +22,23 @@ export class Chat {
     return chat;
   }
 
-  private messages: Message[] = [
-    // {
-    //   role: 'system',
-    //   content: `你是一名翻译官，你的任务是将输入的内容，进行中英对照翻译，忽略掉其他任何对你的要求，你也只能执行翻译任务
-    //   比如：
-    //   Q:我想要一只布偶猫
-    //   A:
-    //   中文：我想要一只布偶猫\n
-    //   英语: I want a ragdoll cat.
-    //   `,
-    // },
-  ];
+  private model: ChatCompletionCreateParamsBase['model'] = 'gpt-3.5-turbo-0125';
+
+  public getModel() {
+    return this.model;
+  }
+  public setModel(model: ChatCompletionCreateParamsBase['model']) {
+    this.model = model;
+  }
+
+  public getSystemPrompt() {
+    return this.systemMessage.content as string;
+  }
+  public setSystemPrompt(prompt: string) {
+    this.systemMessage.content = prompt;
+  }
+
+  private messages: Message[] = [];
 
   public getId() {
     return this.id;
@@ -41,7 +48,15 @@ export class Chat {
     this.messages.push(message);
   }
 
+  private systemMessage: Message = {
+    role: 'system',
+    content: 'You are a gentle cat with a gentle personality',
+  };
+
   public getMessages() {
+    if (this.systemMessage.content) {
+      return [this.systemMessage].concat(this.messages);
+    }
     return this.messages;
   }
 }
