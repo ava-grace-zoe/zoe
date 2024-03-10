@@ -9,6 +9,8 @@ import { ResponseInterceptor } from './interceptor/response.interceptor';
 import { AuthorMiddleware } from './middleware/author.middleware';
 import { LoggerModule } from 'nestjs-pino';
 import pino from 'pino';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 @Module({
   imports: [
     LoggerModule.forRoot({
@@ -20,6 +22,9 @@ import pino from 'pino';
           mkdir: true,
         }),
       },
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'web'), // 替换成你的静态文件根目录
     }),
   ],
   controllers: [AppController, ChatController],
@@ -38,6 +43,6 @@ export class AppModule {
     consumer
       .apply(AuthorMiddleware)
       .exclude('/v1/login')
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
+      .forRoutes({ path: '/v1/*', method: RequestMethod.ALL });
   }
 }
