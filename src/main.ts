@@ -8,7 +8,16 @@ async function bootstrap() {
   if (!isProduction) {
     app.enableCors();
   }
-  app.use(compression());
+  app.use(
+    compression({
+      filter(req: any, res: any) {
+        if (/v1\/chat\//.test(req.url)) {
+          return false;
+        }
+        return compression.filter(req, res);
+      },
+    }),
+  );
   app.setGlobalPrefix('/v1/');
   await app.listen(8080);
 }
