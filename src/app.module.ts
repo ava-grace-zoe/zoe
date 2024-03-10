@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ChatService } from './chat/chat.service';
@@ -11,6 +11,7 @@ import { LoggerModule } from 'nestjs-pino';
 import pino from 'pino';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+
 @Module({
   imports: [
     LoggerModule.forRoot({
@@ -40,9 +41,6 @@ import { join } from 'path';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthorMiddleware)
-      .exclude('/v1/login')
-      .forRoutes({ path: '/v1/*', method: RequestMethod.ALL });
+    consumer.apply(AuthorMiddleware).forRoutes(ChatController);
   }
 }

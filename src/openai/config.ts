@@ -1,9 +1,14 @@
-import OpenAI from 'openai';
+import OpenAI, { ClientOptions } from 'openai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
+const isProduction = process.env.NODE_ENV === 'production';
 export function getOpenAI() {
-  return new OpenAI({
-    apiKey: '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',
-    httpAgent: new HttpsProxyAgent('http://127.0.0.1:7890'),
-  });
+  const clientOptions: ClientOptions = {
+    apiKey: process.env.API_KEY,
+  };
+  if (!isProduction) {
+    clientOptions.httpAgent = new HttpsProxyAgent('http://127.0.0.1:7890');
+  }
+  return new OpenAI(clientOptions);
 }
+//
