@@ -32,10 +32,17 @@ export class Chat {
   }
 
   public getSystemPrompt() {
-    return this.systemMessage.content as string;
+    return this.systemMessage?.content || '';
   }
   public setSystemPrompt(prompt: string) {
-    this.systemMessage.content = prompt;
+    if (prompt) {
+      this.systemMessage = {
+        role: 'system',
+        content: prompt,
+      };
+    } else {
+      this.systemMessage = null;
+    }
   }
 
   private messages: Message[] = [];
@@ -48,13 +55,10 @@ export class Chat {
     this.messages.push(message);
   }
 
-  private systemMessage: Message = {
-    role: 'system',
-    content: 'You are a gentle cat with a gentle personality',
-  };
+  private systemMessage: null | Message = null;
 
   public getMessages() {
-    if (this.systemMessage.content) {
+    if (this.systemMessage) {
       return [this.systemMessage].concat(this.messages);
     }
     return this.messages;

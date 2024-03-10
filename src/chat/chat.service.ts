@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { PinoLogger } from 'nestjs-pino';
 import { ChatCompletionAssistantMessageParam } from 'openai/resources';
 import { Chat } from 'src/lib/Chat';
 import { OpenaiService } from 'src/openai/openai.service';
 
 @Injectable()
 export class ChatService {
-  constructor(private openAiService: OpenaiService) {}
+  constructor(
+    private openAiService: OpenaiService,
+    private logger: PinoLogger,
+  ) {
+    this.logger.setContext(ChatService.name);
+  }
 
   public getChatroomList() {
     return Chat.getAll();
@@ -22,21 +28,23 @@ export class ChatService {
     return {
       messages,
       systemPrompt,
+      model: chat.getModel(),
     };
   }
 
   public async getChatCompletion(
     chatId: string,
     options: { message: string; model: 3 | 4 },
-    onMessage?: (message: string) => void,
+    onMessage?: (done: boolean, message?: string) => void,
   ) {
     const chat = Chat.getInstance(chatId);
 
     const { message, model } = options;
-    chat.addMessage({ role: 'user', content: message });
-    const messages = chat.getMessages();
 
-    console.log(messages);
+    chat.addMessage({ role: 'user', content: message });
+    this.logger.info({ role: 'user', content: message });
+
+    const messages = chat.getMessages();
 
     const reply = await this.openAiService.getChatCompletion(
       messages,
@@ -49,12 +57,18 @@ export class ChatService {
       if (part.choices[0].delta.content) {
         const partContent = part.choices[0].delta.content;
         content += partContent;
-        onMessage?.(partContent);
+        onMessage?.(false, partContent);
       }
     }
+    onMessage?.(true);
     chat.addMessage({
       role: 'assistant',
       content,
     } as ChatCompletionAssistantMessageParam);
+
+    this.logger.info({
+      role: 'assistant',
+      content,
+    });
   }
 }

@@ -39,7 +39,10 @@ export class ChatController {
         message,
         model,
       },
-      (message) => {
+      (done, message) => {
+        if (done) {
+          return res.end();
+        }
         res.write(message);
       },
     );
