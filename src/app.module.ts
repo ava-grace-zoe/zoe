@@ -26,6 +26,17 @@ import { join } from 'path';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'web'), // 替换成你的静态文件根目录
+      serveStaticOptions: {
+        setHeaders(res, path) {
+          if (/\.(j|cs)s$/.test(path)) {
+            res.setHeader('Cache-Control', 'max-age=31536000');
+            res.setHeader(
+              'Expires',
+              new Date(Date.now() + 31536000000).toUTCString(),
+            );
+          }
+        },
+      },
     }),
   ],
   controllers: [AppController, ChatController],
