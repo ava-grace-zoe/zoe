@@ -12,7 +12,7 @@ module.exports = {
       ref: 'origin/feature',
       repo: 'git@github.com:ava-grace-zoe/zoe.git',
       path: '/home/ubuntu/project',
-      'post-deploy': 'yarn && echo successfully!',
+      'post-deploy': 'echo $PATH',
     },
   },
 };
