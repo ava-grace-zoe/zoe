@@ -17,7 +17,8 @@ module.exports = {
       ref: 'origin/feature',
       repo: 'git@github.com:ava-grace-zoe/zoe.git',
       path: '/home/ubuntu/project/zoe',
-      'post-deploy': 'echo $PATH && yarn && yarn build && pm2 start',
+      'post-deploy':
+        'echo $PATH && yarn && yarn build && export NODE_ENV="production" && pm2 start',
     },
   },
 };
