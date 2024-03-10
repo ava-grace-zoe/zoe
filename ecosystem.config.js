@@ -11,14 +11,14 @@ module.exports = {
       env: {
         PATH:
           process.env.PATH + ':/home/ubuntu/.nvm/versions/node/v20.11.1/bin',
+        NODE_ENV: 'production',
       },
       user: 'ubuntu',
       host: '43.153.50.117',
       ref: 'origin/feature',
       repo: 'git@github.com:ava-grace-zoe/zoe.git',
       path: '/home/ubuntu/project/zoe',
-      'post-deploy':
-        'echo $PATH && yarn && yarn build && export NODE_ENV="production" && pm2 start',
+      'post-deploy': 'echo $NODE_ENV &&  yarn && yarn build  && pm2 start',
     },
   },
 };
