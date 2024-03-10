@@ -1,7 +1,7 @@
 import OpenAI, { ClientOptions } from 'openai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { isProduction } from 'src/config';
 
-const isProduction = process.env.NODE_ENV === 'production';
 export function getOpenAI() {
   const clientOptions: ClientOptions = {
     apiKey: process.env.API_KEY,
