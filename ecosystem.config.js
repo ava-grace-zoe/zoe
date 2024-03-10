@@ -1,6 +1,7 @@
 module.exports = {
   apps: [
     {
+      name: 'zoe',
       script: 'dist/main.js',
     },
   ],
@@ -15,8 +16,8 @@ module.exports = {
       host: '43.153.50.117',
       ref: 'origin/feature',
       repo: 'git@github.com:ava-grace-zoe/zoe.git',
-      path: '/home/ubuntu/project',
-      'post-deploy': 'export PATH=$PATH: && echo $PATH && yarn && pm2 start',
+      path: '/home/ubuntu/project/zoe',
+      'post-deploy': 'echo $PATH && yarn && yarn build && pm2 start',
     },
   },
 };
