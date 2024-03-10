@@ -9,11 +9,11 @@ module.exports = {
   deploy: {
     production: {
       user: 'ubuntu',
-      host: ['192.168.0.13', '192.168.0.14', '192.168.0.15'],
-      ref: 'origin/master',
-      repo: 'git@github.com:Username/repository.git',
-      path: '/var/www/my-repository',
-      'post-deploy': 'npm install',
+      host: '43.153.50.117',
+      ref: 'origin/feature',
+      repo: 'git@github.com:ava-grace-zoe/zoe.git',
+      path: '/home/ubuntu/project/zoe',
+      'post-deploy': 'yarn && echo successfully!',
     },
   },
 };
