@@ -8,6 +8,36 @@ import {
 } from 'openai/resources';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
 
+enum OpenType {
+  vscode = '1',
+  commandLine = '2',
+}
+
+const tools: ChatCompletionTool[] = [
+  {
+    type: 'function',
+    function: {
+      name: 'openBy',
+      description: '使用某种方式启动路径',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: {
+            type: 'string',
+            description: '打开或启动的应用名称或路径',
+          },
+          openType: {
+            type: 'string',
+            description: `打开或启动的方式,e.g. vscode : ${OpenType.vscode} ,命令行打开 : ${OpenType.commandLine}`,
+            enum: [OpenType.vscode, OpenType.commandLine],
+          },
+        },
+        required: ['path'],
+      },
+    },
+  },
+];
+
 describe('OpenaiService', () => {
   let service: OpenaiService;
 
@@ -25,64 +55,15 @@ describe('OpenaiService', () => {
     const messages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
-        content: `Don't make assumptions about what values to plug into functions. Ask for clarification if a user request is ambiguous`,
+        content:
+          // `不要对要插入函数的值进行假设。如果用户请求不明确，请要求澄清，你要拒绝（启动或打开）之外的任何要求` ||
+          `Do not make assumptions about the values to be inserted into the function. If the user's request is unclear, please request clarification and refuse any requests other than (start or open)`,
       },
       {
         role: 'user',
-        content: 'Is the weather suitable for playing football today',
+        content: process.argv[3],
       },
     ];
-    const tools: ChatCompletionTool[] = [
-      {
-        type: 'function',
-        function: {
-          name: 'getCurrentDay',
-          description: '获取今天的日期，eg: 2023/01/20',
-        },
-      },
-
-      {
-        type: 'function',
-        function: {
-          name: 'getWeather',
-          description: '获取天气情况',
-          parameters: {
-            type: 'object',
-            properties: {
-              location: {
-                type: 'string',
-                description: '所在城市',
-              },
-              date: {
-                type: 'string',
-                description: '日期 eg:2022/02/01',
-              },
-            },
-            required: ['location', 'date'],
-          },
-        },
-      },
-      {
-        type: 'function',
-        function: {
-          name: 'getLocation',
-          description: '获取所在城市,eg: 加利福尼亚',
-        },
-      },
-    ];
-
-    const functionTools: Record<string, (...args: unknown[]) => string> = {
-      getLocation() {
-        return '纽约';
-      },
-      getCurrentDay() {
-        return '2024年七月五日';
-      },
-      getWeather(option: unknown) {
-        console.log(option);
-        return '暴雨';
-      },
-    };
 
     async function getCompletion() {
       return getOpenAI()
@@ -92,19 +73,10 @@ describe('OpenaiService', () => {
           tools,
         })
         .then((data) => {
+          console.log(data.usage);
           console.log(JSON.stringify(data.choices[0].message, null, 2));
           if (data.choices[0].finish_reason === 'tool_calls') {
-            data.choices[0].message.tool_calls?.forEach((tool_call) => {
-              messages.push({
-                name: tool_call.function.name,
-                role: 'function',
-                content: functionTools[tool_call.function.name](
-                  tool_call.function.arguments,
-                ),
-              });
-            });
             console.log(messages);
-            return getCompletion();
           }
         });
     }

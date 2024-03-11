@@ -8,6 +8,7 @@ async function bootstrap() {
   if (!isProduction) {
     app.enableCors();
   }
+
   app.use(
     compression({
       filter(req: any, res: any) {
@@ -18,7 +19,9 @@ async function bootstrap() {
       },
     }),
   );
+
   app.setGlobalPrefix('/v1/');
+
   await app.listen(8080);
 }
 bootstrap();

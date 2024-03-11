@@ -1,6 +1,6 @@
 import OpenAI, { ClientOptions } from 'openai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import { isProduction } from 'src/config';
+import { isProduction } from '../../src/config';
 
 export function getOpenAI() {
   const clientOptions: ClientOptions = {
