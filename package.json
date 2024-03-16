@@ -24,10 +24,12 @@
   "dependencies": {
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
+    "@nestjs/mongoose": "^10.0.4",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/serve-static": "^4.0.1",
     "@types/pino": "^7.0.5",
     "compression": "^1.7.4",
+    "mongoose": "^8.2.1",
     "nestjs-pino": "^4.0.0",
     "openai": "^4.28.4",
     "pino": "^8.19.0",

@@ -12,9 +12,10 @@ async function bootstrap() {
   app.use(
     compression({
       filter(req: any, res: any) {
-        if (/v1\/chat\//.test(req.url)) {
+        if (/^\/?v1/.test(req.url)) {
           return false;
         }
+
         return compression.filter(req, res);
       },
     }),

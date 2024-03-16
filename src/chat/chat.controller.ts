@@ -1,14 +1,15 @@
 import { ChatService } from './chat.service';
 import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
+import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
 
 @Controller('chat')
 export class ChatController {
   constructor(private chatService: ChatService) {}
 
   @Get()
-  getChatroomList() {
-    return this.chatService.getChatroomList().map((v) => v.getId());
+  async getChatroomList() {
+    return this.chatService.getChatroomList();
   }
 
   @Get(':chatId')
@@ -16,17 +17,18 @@ export class ChatController {
     return this.chatService.getChatroomInfo(chatId);
   }
 
-  @Post(':chatId')
+  @Post()
   async getChatCompletion(
-    @Param('chatId') chatId: string,
     @Res() res: Response,
     @Body()
     {
       message,
       model,
+      chatId,
     }: {
-      model: 3 | 4;
+      model: ChatCompletionCreateParamsBase['model'];
       message: string;
+      chatId?: string;
     },
   ) {
     res.setHeader('Content-Type', 'text/event-stream');
@@ -34,8 +36,8 @@ export class ChatController {
     res.setHeader('Connection', 'keep-alive');
 
     this.chatService.getChatCompletion(
-      chatId,
       {
+        chatId,
         message,
         model,
       },

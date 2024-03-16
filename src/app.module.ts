@@ -1,19 +1,27 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ChatService } from './chat/chat.service';
 import { ChatController } from './chat/chat.controller';
-import { OpenaiService } from './openai/openai.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { ResponseInterceptor } from './interceptor/response.interceptor';
+import { ResponseInterceptor } from './common/interceptors/response/response.interceptor';
 import { AuthorMiddleware } from './middleware/author.middleware';
 import { LoggerModule } from 'nestjs-pino';
 import pino from 'pino';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ChatModule } from './chat/chat.module';
+import { OpenaiModule } from './openai/openai.module';
 
 @Module({
   imports: [
+    MongooseModule.forRoot('mongodb://localhost:7900', {
+      connectionErrorFactory(error) {
+        console.error(error);
+        return error;
+      },
+    }),
+
     LoggerModule.forRoot({
       pinoHttp: {
         stream: pino.destination({
@@ -38,12 +46,12 @@ import { join } from 'path';
         },
       },
     }),
+    ChatModule,
+    OpenaiModule,
   ],
-  controllers: [AppController, ChatController],
+  controllers: [AppController],
   providers: [
     AppService,
-    ChatService,
-    OpenaiService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
