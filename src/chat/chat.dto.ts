@@ -9,6 +9,7 @@ export class ChatDTO {
   model: ChatCompletionCreateParamsBase['model'];
   systemPrompt: string;
   title: string;
+  del: number;
 }
 
 export class Chat extends ChatDTO {

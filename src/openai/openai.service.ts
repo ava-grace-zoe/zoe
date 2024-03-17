@@ -17,6 +17,16 @@ export class OpenaiService {
     model: ChatCompletionCreateParamsBase['model'],
     stream = false,
   ) {
+    console.log(
+      JSON.stringify(
+        {
+          model,
+          messages,
+        },
+        null,
+        2,
+      ),
+    );
     return this.api.chat.completions.create({
       messages: messages,
       model,
@@ -42,7 +52,6 @@ export class OpenaiService {
       })
       .then((data) => {
         const result = data.choices[0].message.content;
-        console.log(data.choices[0]);
         if (typeof result !== 'string') {
           throw new Error(
             `can't summary "${content}"  result ${JSON.stringify(

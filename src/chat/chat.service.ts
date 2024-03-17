@@ -15,27 +15,42 @@ export class ChatService {
 
   public async getChatroomList() {
     const result = await this.chatModel
-      .find({}, { title: true })
+      .find(
+        {
+          del: { $ne: 1 },
+        },
+        { title: true },
+      )
       .sort({ updatedAt: -1 });
     return result;
   }
+  public async remove(chatId: string) {
+    return this.chatModel.updateOne(
+      { _id: chatId },
+      {
+        del: 1,
+      },
+    );
+  }
 
   public async getChatroomInfo(chatId: string) {
-    const chat = await this.chatModel.findById(chatId);
+    const chat = await this.chatModel.findById(chatId, {
+      _id: false,
+      del: false,
+      __v: false,
+    });
 
     if (!chat) {
       return null;
     }
 
-    const messages = chat.messages.filter(this.openAiService.isAssistantOrUser);
+    const chatObject = chat.toObject();
 
-    const systemPrompt = chat?.systemPrompt;
+    chatObject.messages = chatObject.messages.filter(
+      this.openAiService.isAssistantOrUser,
+    );
 
-    return {
-      messages,
-      systemPrompt,
-      model: chat.model,
-    };
+    return chatObject;
   }
 
   public async getChatCompletion(
@@ -90,6 +105,7 @@ export class ChatService {
       }
     }
     onMessage?.(true);
+
     chat.addMessage({
       role: 'assistant',
       content,
@@ -99,13 +115,14 @@ export class ChatService {
       .getMessages()
       .filter(this.openAiService.isAssistantOrUser);
 
-    console.log(JSON.stringify(finalMessages, null, 2));
-
     this.chatModel
-      .findByIdAndUpdate(chatId, {
-        messages: finalMessages,
-        $currentDate: { updatedAt: true },
-      })
+      .updateOne(
+        { _id: chatId },
+        {
+          messages: finalMessages,
+          $currentDate: { updatedAt: true },
+        },
+      )
       .then(console.log);
   }
 }

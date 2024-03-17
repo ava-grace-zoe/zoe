@@ -11,6 +11,7 @@ const MessageSchema = new mongoose.Schema(
 );
 
 export const ChatSchema = new mongoose.Schema({
+  del: { type: Number, default: 0 },
   title: String,
   messages: [MessageSchema],
   model: String,
