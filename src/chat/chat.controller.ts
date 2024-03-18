@@ -6,10 +6,12 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
+import { ChatDTO } from './chat.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -27,6 +29,14 @@ export class ChatController {
   @Delete(':chatId')
   removeChatroom(@Param('chatId') chatId: string) {
     return this.chatService.remove(chatId);
+  }
+
+  @Put(':chatId')
+  async updateChatroomInfo(
+    @Param('chatId') chatId: string,
+    @Body() chatDTO: ChatDTO,
+  ) {
+    return this.chatService.updateChatroomInfo(chatId, chatDTO);
   }
 
   @Post()

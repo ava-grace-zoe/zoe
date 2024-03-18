@@ -33,6 +33,16 @@ export class ChatService {
     );
   }
 
+  public async updateChatroomInfo(chatId: string, chatInfo: Partial<ChatDTO>) {
+    const chatInstance = Chat.getInstance(chatId);
+    if (chatInstance) {
+      chatInstance.title = chatInfo.title || '';
+      chatInstance.setSystemPrompt(chatInfo.systemPrompt || '');
+    }
+
+    return this.chatModel.updateOne({ _id: chatId }, chatInfo);
+  }
+
   public async getChatroomInfo(chatId: string) {
     const chat = await this.chatModel.findById(chatId, {
       _id: false,
@@ -115,14 +125,12 @@ export class ChatService {
       .getMessages()
       .filter(this.openAiService.isAssistantOrUser);
 
-    this.chatModel
-      .updateOne(
-        { _id: chatId },
-        {
-          messages: finalMessages,
-          $currentDate: { updatedAt: true },
-        },
-      )
-      .then(console.log);
+    this.chatModel.updateOne(
+      { _id: chatId },
+      {
+        messages: finalMessages,
+        $currentDate: { updatedAt: true },
+      },
+    );
   }
 }

@@ -17,16 +17,16 @@ export class OpenaiService {
     model: ChatCompletionCreateParamsBase['model'],
     stream = false,
   ) {
-    console.log(
-      JSON.stringify(
-        {
-          model,
-          messages,
-        },
-        null,
-        2,
-      ),
-    );
+    // console.log(
+    //   JSON.stringify(
+    //     {
+    //       model,
+    //       messages,
+    //     },
+    //     null,
+    //     2,
+    //   ),
+    // );
     return this.api.chat.completions.create({
       messages: messages,
       model,
