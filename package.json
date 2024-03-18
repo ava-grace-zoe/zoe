@@ -20,7 +20,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "inject-path": "export PATH=$PATH:/home/ubuntu/.nvm/versions/node/v20.11.1/bin",
-    "pm2start": "export NODE_ENV='production' && pm2 start"
+    "pm2start": "export NODE_ENV='production' && pm2 start",
+    "deploy": "pm2 deploy production"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
