@@ -1,3 +1,6 @@
+const HOST = '43.153.50.117';
+const USER = 'ubuntu';
+
 module.exports = {
   apps: [
     {
@@ -8,16 +11,12 @@ module.exports = {
 
   deploy: {
     production: {
-      env: {
-        PATH:
-          process.env.PATH + ':/home/ubuntu/.nvm/versions/node/v20.11.1/bin',
-      },
-      user: 'ubuntu',
-      host: '43.153.50.117',
+      user: USER,
+      host: HOST,
       ref: 'origin/feature',
       repo: 'git@github.com:ava-grace-zoe/zoe.git',
       path: '/home/ubuntu/project/zoe',
-      'post-deploy': 'yarn && yarn build  && yarn pm2start',
+      'post-deploy': 'yarn && yarn build  && yarn inject-path && yarn pm2start',
     },
   },
 };

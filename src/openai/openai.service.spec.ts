@@ -8,7 +8,7 @@ import {
 } from 'openai/resources';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
 
-enum OpenType {
+export enum OpenType {
   vscode = '1',
   commandLine = '2',
 }
@@ -17,22 +17,21 @@ const tools: ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
-      name: 'openBy',
-      description: '使用某种方式启动路径',
+      name: 'runProjectWith',
+      description: `使用'vscode'或'命令行' 启动项目`,
       parameters: {
         type: 'object',
         properties: {
-          path: {
+          projectName: {
             type: 'string',
-            description: '打开或启动的应用名称或路径',
+            description: 'project name',
           },
-          openType: {
+          openMethod: {
             type: 'string',
-            description: `打开或启动的方式,e.g. vscode : ${OpenType.vscode} ,命令行打开 : ${OpenType.commandLine}`,
-            enum: [OpenType.vscode, OpenType.commandLine],
+            description: `打开项目的方式'vscode'或者'命令行'`,
           },
         },
-        required: ['path'],
+        required: ['projectName', 'openMethod'],
       },
     },
   },
@@ -51,13 +50,11 @@ describe('OpenaiService', () => {
 
   it('should be defined', async () => {
     expect(service).toBeDefined();
-    const model: ChatCompletionCreateParamsBase['model'] = 'gpt-3.5-turbo';
+    const model: ChatCompletionCreateParamsBase['model'] = 'gpt-3.5-turbo-0125';
     const messages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
-        content:
-          // `不要对要插入函数的值进行假设。如果用户请求不明确，请要求澄清，你要拒绝（启动或打开）之外的任何要求` ||
-          `Do not make assumptions about the values to be inserted into the function. If the user's request is unclear, please request clarification and refuse any requests other than (start or open)`,
+        content: `你会得到用户的请求，你必须要明确打开方式与打开的项目名称，不要对打开方式与打开名称做任何的假设，否则会发生不好的事情! 如果请求中缺少必要的信息，你要主动要求用户澄清或者提供`,
       },
       {
         role: 'user',
@@ -73,10 +70,22 @@ describe('OpenaiService', () => {
           tools,
         })
         .then((data) => {
-          console.log(data.usage);
-          console.log(JSON.stringify(data.choices[0].message, null, 2));
+          // console.log(data.usage);
           if (data.choices[0].finish_reason === 'tool_calls') {
-            console.log(messages);
+            data.choices[0].message.tool_calls?.forEach((v) => {
+              console.log(
+                JSON.stringify(
+                  {
+                    名称: v.function.name,
+                    参数: JSON.parse(v.function.arguments),
+                  },
+                  null,
+                  2,
+                ),
+              );
+            });
+          } else {
+            console.log(data.choices[0].message);
           }
         });
     }
