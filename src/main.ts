@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as compression from 'compression';
+import { isProduction } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +17,9 @@ async function bootstrap() {
       },
     }),
   );
+  if (!isProduction) {
+    app.enableCors();
+  }
 
   app.setGlobalPrefix('/v1/');
 

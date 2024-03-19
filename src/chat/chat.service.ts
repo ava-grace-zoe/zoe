@@ -99,9 +99,13 @@ export class ChatService {
       chatId = chatModel._id.toHexString();
       onMessage?.(false, JSON.stringify({ chatId }));
     }
+    let sendMessages = messages;
+    if (model.indexOf('gpt-4') > -1) {
+      sendMessages = [messages[0], messages[messages.length - 1]];
+    }
 
     const reply = await this.openAiService.getChatCompletion(
-      messages,
+      sendMessages,
       model,
       true,
     );
@@ -114,7 +118,6 @@ export class ChatService {
         onMessage?.(false, partContent);
       }
     }
-    onMessage?.(true);
 
     chat.addMessage({
       role: 'assistant',
@@ -124,15 +127,14 @@ export class ChatService {
     const finalMessages = chat
       .getMessages()
       .filter(this.openAiService.isAssistantOrUser);
-    console.log('update', chatId, finalMessages);
-    this.chatModel
-      .updateOne(
-        { _id: chatId },
-        {
-          messages: finalMessages,
-          $currentDate: { updatedAt: true },
-        },
-      )
-      .then(console.log);
+
+    await this.chatModel.updateOne(
+      { _id: chatId },
+      {
+        messages: finalMessages,
+        $currentDate: { updatedAt: true },
+      },
+    );
+    onMessage?.(true);
   }
 }
