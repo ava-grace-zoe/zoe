@@ -12,6 +12,7 @@ import { join } from 'path';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ChatModule } from './chat/chat.module';
 import { OpenaiModule } from './openai/openai.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { OpenaiModule } from './openai/openai.module';
       rootPath: join(process.cwd(), 'web'), // 替换成你的静态文件根目录
       serveStaticOptions: {
         setHeaders(res, path) {
-          if (/\.(j|cs)s$/.test(path)) {
+          if (/\.(js|css|webp)$/.test(path)) {
             res.setHeader('Cache-Control', 'max-age=31536000');
             res.setHeader(
               'Expires',
@@ -48,6 +49,7 @@ import { OpenaiModule } from './openai/openai.module';
     }),
     ChatModule,
     OpenaiModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [
