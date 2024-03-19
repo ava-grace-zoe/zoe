@@ -124,13 +124,15 @@ export class ChatService {
     const finalMessages = chat
       .getMessages()
       .filter(this.openAiService.isAssistantOrUser);
-
-    this.chatModel.updateOne(
-      { _id: chatId },
-      {
-        messages: finalMessages,
-        $currentDate: { updatedAt: true },
-      },
-    );
+    console.log('update', chatId, finalMessages);
+    this.chatModel
+      .updateOne(
+        { _id: chatId },
+        {
+          messages: finalMessages,
+          $currentDate: { updatedAt: true },
+        },
+      )
+      .then(console.log);
   }
 }
