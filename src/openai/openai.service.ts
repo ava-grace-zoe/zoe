@@ -10,7 +10,7 @@ import { Stream } from 'openai/streaming';
 const ROLES = ['assistant', 'user'];
 @Injectable()
 export class OpenaiService {
-  private api = getOpenAI();
+  public api = getOpenAI();
 
   public async getChatCompletion(
     messages: ChatCompletionMessageParam[],

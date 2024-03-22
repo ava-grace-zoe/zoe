@@ -17,6 +17,7 @@ import { UserModule } from './user/user.module';
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost:7900', {
+      dbName: 'chats',
       connectionErrorFactory(error) {
         console.error(error);
         return error;

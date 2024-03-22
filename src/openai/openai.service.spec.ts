@@ -7,6 +7,14 @@ import {
   ChatCompletionTool,
 } from 'openai/resources';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
+import {
+  appendFileSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  writeFileSync,
+} from 'fs';
+import { join } from 'path';
 
 export enum OpenType {
   vscode = '1',
@@ -48,9 +56,9 @@ describe('OpenaiService', () => {
     service = module.get<OpenaiService>(OpenaiService);
   });
 
-  it('should be defined', async () => {
+  it.skip('should be defined', async () => {
     expect(service).toBeDefined();
-    const model: ChatCompletionCreateParamsBase['model'] = 'gpt-3.5-turbo-0125';
+    const model: ChatCompletionCreateParamsBase['model'] = 'gpt-4-0125-preview';
     const messages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
@@ -92,4 +100,38 @@ describe('OpenaiService', () => {
 
     return getCompletion();
   }, 10000);
+
+  const csvPath = join(__dirname, 'embedding.json');
+  const baseDir =
+    '/Users/ragdoll/ragdoll/project/sparkedu/cocos-game-core-logic/src/component';
+  test.only('embedding', async () => {
+    const dirs = readdirSync(
+      '/Users/ragdoll/ragdoll/project/sparkedu/cocos-game-core-logic/src/component',
+    );
+    const embedding: {
+      name: string;
+      vector: number[];
+    }[] = [];
+    for (const dir of dirs) {
+      console.log(dir);
+
+      const filePath = join(baseDir, dir);
+      const sta = statSync(filePath);
+      if (sta.isDirectory()) {
+        continue;
+      }
+      const content = readFileSync(filePath).toString();
+      const result = await service.api.embeddings.create({
+        input: content,
+        model: 'text-embedding-ada-002',
+      });
+      embedding.push({
+        name: dir,
+        vector: result.data[0].embedding,
+      });
+      console.log(result);
+    }
+
+    writeFileSync(csvPath, JSON.stringify(embedding));
+  }, 1000000);
 });
