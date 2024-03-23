@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Chat, ChatDTO } from './chat.dto';
 import { OpenaiService } from '../openai/openai.service';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
+import { getFormatDate } from 'src/help/getFormatDate';
 
 type GPTModel = ChatCompletionCreateParamsBase['model'];
 @Injectable()
@@ -62,6 +63,9 @@ export class ChatService {
 
     return chatObject;
   }
+  isFourModel(model: string) {
+    return model.indexOf('gpt-4') > -1;
+  }
 
   public async getChatCompletion(
     options: { message: string; model: GPTModel; chatId?: string },
@@ -75,7 +79,15 @@ export class ChatService {
     if (!chatId) {
       chat.title = await this.openAiService.summaryTitle(options.message);
       chat.setModel(model);
-      chat.setSystemPrompt('You are an intelligent assistant');
+
+      if (!this.isFourModel(model)) {
+        chat.setSystemPrompt(`You are ChatGPT, a large language model trained by OpenAI, based on the GPT-3.5 architecture.
+        Knowledge cutoff: ${getFormatDate(
+          'yyyy-mm-dd',
+          new Date(Date.now() - 1000 * 3600 * 24),
+        )}
+        Current date: ${getFormatDate('yyyy-mm-dd')}`);
+      }
     } else {
       const chatInstance = Chat.getInstance(chatId);
       if (!chatInstance) {

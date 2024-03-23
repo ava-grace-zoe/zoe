@@ -7,15 +7,9 @@ import {
   ChatCompletionTool,
 } from 'openai/resources';
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions';
-import {
-  appendFileSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-  writeFileSync,
-} from 'fs';
+import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
 import { join } from 'path';
-
+import computed from 'compute-cosine-similarity';
 export enum OpenType {
   vscode = '1',
   commandLine = '2',
@@ -104,7 +98,7 @@ describe('OpenaiService', () => {
   const csvPath = join(__dirname, 'embedding.json');
   const baseDir =
     '/Users/ragdoll/ragdoll/project/sparkedu/cocos-game-core-logic/src/component';
-  test.only('embedding', async () => {
+  test('embedding', async () => {
     const dirs = readdirSync(
       '/Users/ragdoll/ragdoll/project/sparkedu/cocos-game-core-logic/src/component',
     );
@@ -134,4 +128,30 @@ describe('OpenaiService', () => {
 
     writeFileSync(csvPath, JSON.stringify(embedding));
   }, 1000000);
+
+  test.only('search', async () => {
+    const vectors = JSON.parse(readFileSync(csvPath).toString()) as {
+      name: string;
+      vector: number[];
+    }[];
+    const embedding = (
+      await service.api.embeddings.create({
+        input: `beginSyncAction`,
+        model: 'text-embedding-ada-002',
+      })
+    ).data[0].embedding;
+
+    console.log(
+      vectors
+        .map((v) => {
+          return {
+            name: v.name,
+            distance: computed(v.vector, embedding),
+          };
+        })
+        .sort((b, a) => (a.distance || 0) - (b.distance || 0)),
+    );
+
+    // compute
+  }, 10000);
 });
