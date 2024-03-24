@@ -70,4 +70,7 @@ export class OpenaiService {
       return ROLES.includes(role.role);
     }
   }
+  public getAPI(key: string) {
+    return getOpenAI(key);
+  }
 }
