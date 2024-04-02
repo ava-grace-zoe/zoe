@@ -13,6 +13,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ChatModule } from './chat/chat.module';
 import { OpenaiModule } from './openai/openai.module';
 import { UserModule } from './user/user.module';
+import { EmbedModule } from './embed/embed.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { UserModule } from './user/user.module';
     ChatModule,
     OpenaiModule,
     UserModule,
+    EmbedModule,
   ],
   controllers: [AppController],
   providers: [

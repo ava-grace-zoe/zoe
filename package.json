@@ -29,11 +29,15 @@
     "@nestjs/mongoose": "^10.0.4",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/serve-static": "^4.0.1",
+    "@types/klaw-sync": "^6.0.5",
     "@types/pino": "^7.0.5",
+    "axios": "^1.6.8",
     "compression": "^1.7.4",
     "compute-cosine-similarity": "^1.1.0",
+    "klaw-sync": "^6.0.0",
     "mongoose": "^8.2.1",
     "nestjs-pino": "^4.0.0",
+    "node-fetch": "^3.3.2",
     "openai": "^4.28.4",
     "pino": "^8.19.0",
     "pino-http": "^9.0.0",
@@ -81,6 +85,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "transformIgnorePatterns": [
+      "node_modules(?!/axios)"
+    ]
   }
 }
