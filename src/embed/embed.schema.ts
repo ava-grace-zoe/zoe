@@ -6,4 +6,7 @@ export const EmbedSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
   content: String,
   vector: [Number],
+  name: String,
 });
+
+EmbedSchema.index({ vector: '2dsphere' });

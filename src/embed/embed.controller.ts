@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { EmbedService } from './embed.service';
 import klaw from 'klaw-sync';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import similarity from 'compute-cosine-similarity';
 import { getOpenAI } from 'src/openai/config';
 
@@ -13,10 +13,18 @@ export class EmbedController {
   async create(@Query() query: { path: string }) {
     console.log(query);
 
+    console.log(existsSync(query.path));
+    if (!existsSync(query.path)) {
+      throw new Error('路径不存在');
+    }
+
     const items = klaw(query.path, {
       filter: (item) => {
         if (item.stats.isDirectory()) return true;
 
+        if (/\.test\.ts$/.test(item.path)) {
+          return false;
+        }
         if (/d\.ts$/.test(item.path)) {
           return false;
         }
@@ -30,10 +38,12 @@ export class EmbedController {
         console.log(++count, items.length);
         continue;
       }
-      await this.service.create(readFileSync(item.path).toString());
+      const name = item.path;
+      const content = readFileSync(item.path).toString();
+      const embedding = await this.service.getEmbedding(content);
+      await this.service.create(name, content, embedding);
       console.log(++count, items.length);
     }
-    // return this.service.create(query.path);
     return null;
   }
 
@@ -44,7 +54,7 @@ export class EmbedController {
       .map((v) => {
         return {
           content: v.content,
-          similarity: similarity(v.vector, queryEmbedding)!,
+          similarity: similarity(v.vector, queryEmbedding) || 0,
         };
       })
       .sort((a, b) => b.similarity - a.similarity)
@@ -57,6 +67,7 @@ export class EmbedController {
         },
         { contentLength: 0, content: '' },
       );
+    console.log(result);
 
     return getOpenAI(
       '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',
@@ -76,5 +87,25 @@ export class EmbedController {
         },
       ],
     });
+  }
+
+  @Get('search-v1')
+  async searchV1(@Query() query: { query: string }) {
+    const queryEmbedding = await this.service.getEmbedding(query.query);
+    const result = (await this.service.getAll())
+      .map((v) => {
+        return {
+          name: v.name,
+          content: v.content,
+          similarity: similarity(v.vector, queryEmbedding) || 0,
+        };
+      })
+      .sort((a, b) => b.similarity - a.similarity)
+      .filter((v) => {
+        return v.similarity > 0.6;
+      })
+      .slice(0, 5);
+
+    return result;
   }
 }

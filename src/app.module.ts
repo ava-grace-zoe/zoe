@@ -14,6 +14,7 @@ import { ChatModule } from './chat/chat.module';
 import { OpenaiModule } from './openai/openai.module';
 import { UserModule } from './user/user.module';
 import { EmbedModule } from './embed/embed.module';
+import { LlmModule } from './llm/llm.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { EmbedModule } from './embed/embed.module';
     OpenaiModule,
     UserModule,
     EmbedModule,
+    LlmModule,
   ],
   controllers: [AppController],
   providers: [
