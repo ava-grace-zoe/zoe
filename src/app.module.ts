@@ -15,6 +15,7 @@ import { OpenaiModule } from './openai/openai.module';
 import { UserModule } from './user/user.module';
 import { EmbedModule } from './embed/embed.module';
 import { LlmModule } from './llm/llm.module';
+import { GameTaskModule } from './game-task/game-task.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { LlmModule } from './llm/llm.module';
     UserModule,
     EmbedModule,
     LlmModule,
+    GameTaskModule,
   ],
   controllers: [AppController],
   providers: [
