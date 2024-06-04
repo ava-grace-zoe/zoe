@@ -2,12 +2,10 @@ const HOST = '43.153.50.117';
 const USER = 'ubuntu';
 
 module.exports = {
-  apps: [
-    {
-      name: 'zoe',
-      script: 'dist/src/main.js',
-    },
-  ],
+  apps: {
+    name: 'zoe',
+    script: 'dist/src/main.js',
+  },
 
   deploy: {
     production: {
