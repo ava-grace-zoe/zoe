@@ -5,7 +5,7 @@ module.exports = {
   apps: [
     {
       name: 'zoe',
-      script: 'dist/main.js',
+      script: 'dist/src/main.js',
     },
   ],
 
